@@ -260,7 +260,7 @@
 <script>
 
 const API_URL =
-  "PASTE_YOUR_EXEC_URL_HERE";
+  "https://script.google.com/macros/s/AKfycbxxdiXA38ymyv4tCfVQ5Em0CaIZp9zheAWaQAdwu6R8wauc-KXEmh_cN9ILvOvfEsVr/exec";
 
 let selectedDivision =
   "1st-2nd Grade";
@@ -390,7 +390,119 @@ function loadStandings() {
   );
 
 }
+function showStandings(data) {
 
+  const standings =
+    data.standings || [];
+
+  if (standings.length === 0) {
+
+    document
+      .getElementById("standings")
+      .innerHTML =
+        '<div class="loading">' +
+        'No fish submitted yet.' +
+        '</div>';
+
+    return;
+  }
+
+  let html = "";
+
+  standings.forEach(
+    function(row) {
+
+      let placeClass = "";
+
+      if (row.place === 1) {
+        placeClass = "first";
+      }
+
+      if (row.place === 2) {
+        placeClass = "second";
+      }
+
+      if (row.place === 3) {
+        placeClass = "third";
+      }
+
+      let medal = row.place;
+
+      if (row.place === 1) {
+        medal = "🥇";
+      }
+
+      if (row.place === 2) {
+        medal = "🥈";
+      }
+
+      if (row.place === 3) {
+        medal = "🥉";
+      }
+
+      let photoHtml = "";
+
+      if (row.photo) {
+
+        photoHtml =
+          '<a class="photo-button" ' +
+          'href="' +
+          escapeHtml(row.photo) +
+          '" ' +
+          'target="_blank" ' +
+          'rel="noopener noreferrer" ' +
+          'title="View Fish Photo">' +
+          '📷' +
+          '</a>';
+
+      }
+
+      html +=
+
+        '<div class="fish-card ' +
+        placeClass +
+        '">' +
+
+          '<div class="place">' +
+          medal +
+          '</div>' +
+
+          '<div>' +
+
+            '<div class="angler">' +
+            escapeHtml(
+              row.angler || "Angler"
+            ) +
+            '</div>' +
+
+            '<div class="details">' +
+            escapeHtml(row.team) +
+            ' • ' +
+            escapeHtml(row.tournament) +
+            '</div>' +
+
+          '</div>' +
+
+          '<div class="weight">' +
+          Number(row.weight)
+            .toFixed(2) +
+          ' lbs' +
+          '</div>' +
+
+          '<div>' +
+          photoHtml +
+          '</div>' +
+
+        '</div>';
+
+    }
+  );
+
+  document
+    .getElementById("standings")
+    .innerHTML = html;
+
+}
 
 function escapeHtml(text) {
 
