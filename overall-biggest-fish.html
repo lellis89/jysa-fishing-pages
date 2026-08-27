@@ -266,10 +266,7 @@ let selectedDivision =
   "1st-2nd Grade";
 
 
-function changeDivision(
-  division,
-  button
-) {
+function changeDivision(division, button) {
 
   selectedDivision = division;
 
@@ -286,60 +283,125 @@ function changeDivision(
 }
 
 
+/*******************************************************
+ * FIXED JSONP CALLBACK
+ *******************************************************/
+
+function jysaCallback(data) {
+
+  console.log(
+    "Data received from Apps Script:",
+    data
+  );
+
+  document
+    .getElementById("updated")
+    .innerText =
+      "Last updated: " +
+      new Date().toLocaleTimeString();
+
+  showStandings(data);
+
+}
+
+
+/*******************************************************
+ * LOAD DATA
+ *******************************************************/
+
 function loadStandings() {
 
-  document.getElementById("updated").innerText =
-    "Loading leaderboard...";
+  document
+    .getElementById("updated")
+    .innerText =
+      "Loading leaderboard...";
 
-  const callbackName =
-    "jysaCallback_" + Date.now();
+  console.log(
+    "Loading division:",
+    selectedDivision
+  );
 
-  window[callbackName] =
-    function(data) {
 
-      document.getElementById("updated").innerText =
-        "Last updated: " +
-        new Date().toLocaleTimeString();
+  // Remove previous API script
+  const oldScript =
+    document.getElementById(
+      "jysaApiScript"
+    );
 
-      showStandings(data);
-
-      delete window[callbackName];
-    };
+  if (oldScript) {
+    oldScript.remove();
+  }
 
 
   const script =
     document.createElement("script");
 
+  script.id =
+    "jysaApiScript";
+
+
   script.src =
     API_URL +
     "?api=overallBiggestFish" +
     "&division=" +
-    encodeURIComponent(selectedDivision) +
-    "&callback=" +
-    callbackName +
+    encodeURIComponent(
+      selectedDivision
+    ) +
+    "&callback=jysaCallback" +
     "&t=" +
     Date.now();
 
 
-  script.onerror =
+  console.log(
+    "Request URL:",
+    script.src
+  );
+
+
+  script.onload =
     function() {
 
-      document.getElementById("standings").innerHTML =
-        '<div class="error">' +
-        'Unable to load leaderboard.' +
-        '</div>';
+      console.log(
+        "Apps Script response loaded."
+      );
 
-      delete window[callbackName];
     };
 
 
-  document.body.appendChild(script);
+  script.onerror =
+    function(error) {
+
+      console.error(
+        "Apps Script failed to load:",
+        error
+      );
+
+      document
+        .getElementById("standings")
+        .innerHTML =
+          '<div class="error">' +
+          'Unable to load leaderboard.' +
+          '</div>';
+
+    };
+
+
+  document.body.appendChild(
+    script
+  );
 
 }
+
+
+/*******************************************************
+ * DISPLAY LEADERBOARD
+ *******************************************************/
+
 function showStandings(data) {
 
   const standings =
     data.standings || [];
+
 
   if (standings.length === 0) {
 
@@ -351,9 +413,12 @@ function showStandings(data) {
         '</div>';
 
     return;
+
   }
 
+
   let html = "";
+
 
   standings.forEach(
     function(row) {
@@ -372,6 +437,7 @@ function showStandings(data) {
         placeClass = "third";
       }
 
+
       let medal = row.place;
 
       if (row.place === 1) {
@@ -385,6 +451,7 @@ function showStandings(data) {
       if (row.place === 3) {
         medal = "🥉";
       }
+
 
       let photoHtml = "";
 
@@ -402,6 +469,7 @@ function showStandings(data) {
           '</a>';
 
       }
+
 
       html +=
 
@@ -444,11 +512,18 @@ function showStandings(data) {
     }
   );
 
+
   document
     .getElementById("standings")
-    .innerHTML = html;
+    .innerHTML =
+      html;
 
 }
+
+
+/*******************************************************
+ * SAFE HTML
+ *******************************************************/
 
 function escapeHtml(text) {
 
@@ -466,6 +541,10 @@ function escapeHtml(text) {
 }
 
 
+/*******************************************************
+ * START
+ *******************************************************/
+
 loadStandings();
 
 setInterval(
@@ -474,6 +553,3 @@ setInterval(
 );
 
 </script>
-
-</body>
-</html>
