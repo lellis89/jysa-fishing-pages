@@ -286,162 +286,108 @@ function changeDivision(
 }
 
 
-async function loadStandings() {
-
-  try {
-
-    const url =
-      API_URL +
-      "?api=overallBiggestFish" +
-      "&division=" +
-      encodeURIComponent(
-        selectedDivision
-      );
-
-    const response =
-      await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(
-        "Unable to load leaderboard."
-      );
-    }
-
-    const data =
-      await response.json();
-
-    document
-      .getElementById("updated")
-      .innerText =
-        "Last updated: " +
-        new Date()
-          .toLocaleTimeString();
-
-    showStandings(data);
-
-  } catch (error) {
-
-    document
-      .getElementById("standings")
-      .innerHTML =
-        '<div class="error">' +
-        escapeHtml(error.message) +
-        '</div>';
-
-  }
-
-}
-
-
-function showStandings(data) {
-
-  const standings =
-    data.standings || [];
-
-  if (standings.length === 0) {
-
-    document
-      .getElementById("standings")
-      .innerHTML =
-        '<div class="loading">' +
-        'No fish submitted yet.' +
-        '</div>';
-
-    return;
-
-  }
-
-  let html = "";
-
-  standings.forEach(
-    function(row) {
-
-      let placeClass = "";
-
-      if (row.place === 1) {
-        placeClass = "first";
-      }
-
-      if (row.place === 2) {
-        placeClass = "second";
-      }
-
-      if (row.place === 3) {
-        placeClass = "third";
-      }
-
-      let medal = row.place;
-
-      if (row.place === 1) {
-        medal = "🥇";
-      }
-
-      if (row.place === 2) {
-        medal = "🥈";
-      }
-
-      if (row.place === 3) {
-        medal = "🥉";
-      }
-
-      let photoHtml = "";
-
-      if (row.photo) {
-
-        photoHtml =
-          '<a class="photo-button" ' +
-          'href="' +
-          escapeHtml(row.photo) +
-          '" target="_blank" ' +
-          'rel="noopener noreferrer">' +
-          '📷' +
-          '</a>';
-
-      }
-
-      html +=
-        '<div class="fish-card ' +
-        placeClass +
-        '">' +
-
-          '<div class="place">' +
-          medal +
-          '</div>' +
-
-          '<div>' +
-
-            '<div class="angler">' +
-            escapeHtml(
-              row.angler || "Angler"
-            ) +
-            '</div>' +
-
-            '<div class="details">' +
-            escapeHtml(row.team) +
-            ' • ' +
-            escapeHtml(row.tournament) +
-            '</div>' +
-
-          '</div>' +
-
-          '<div class="weight">' +
-          Number(row.weight)
-            .toFixed(2) +
-          ' lbs' +
-          '</div>' +
-
-          '<div>' +
-          photoHtml +
-          '</div>' +
-
-        '</div>';
-
-    }
-  );
+function loadStandings() {
 
   document
-    .getElementById("standings")
-    .innerHTML = html;
+    .getElementById("updated")
+    .innerText =
+      "Loading leaderboard...";
+
+
+  // Remove an old JSONP script if it exists
+  const oldScript =
+    document.getElementById(
+      "perryDataScript"
+    );
+
+  if (oldScript) {
+    oldScript.remove();
+  }
+
+
+  // Create a unique callback name
+  const callbackName =
+    "jysaCallback_" +
+    Date.now();
+
+
+  window[callbackName] =
+    function(data) {
+
+      try {
+
+        document
+          .getElementById("updated")
+          .innerText =
+            "Last updated: " +
+            new Date()
+              .toLocaleTimeString();
+
+        showStandings(data);
+
+      } finally {
+
+        delete window[
+          callbackName
+        ];
+
+        const script =
+          document.getElementById(
+            "perryDataScript"
+          );
+
+        if (script) {
+          script.remove();
+        }
+
+      }
+
+    };
+
+
+  const script =
+    document.createElement(
+      "script"
+    );
+
+
+  script.id =
+    "perryDataScript";
+
+
+  script.src =
+    API_URL +
+    "?api=overallBiggestFish" +
+    "&division=" +
+    encodeURIComponent(
+      selectedDivision
+    ) +
+    "&callback=" +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  script.onerror =
+    function() {
+
+      document
+        .getElementById("standings")
+        .innerHTML =
+          '<div class="error">' +
+          'Unable to load leaderboard.' +
+          '</div>';
+
+      delete window[
+        callbackName
+      ];
+
+    };
+
+
+  document.body.appendChild(
+    script
+  );
 
 }
 
