@@ -288,106 +288,52 @@ function changeDivision(
 
 function loadStandings() {
 
-  document
-    .getElementById("updated")
-    .innerText =
-      "Loading leaderboard...";
+  document.getElementById("updated").innerText =
+    "Loading leaderboard...";
 
-
-  // Remove an old JSONP script if it exists
-  const oldScript =
-    document.getElementById(
-      "perryDataScript"
-    );
-
-  if (oldScript) {
-    oldScript.remove();
-  }
-
-
-  // Create a unique callback name
   const callbackName =
-    "jysaCallback_" +
-    Date.now();
-
+    "jysaCallback_" + Date.now();
 
   window[callbackName] =
     function(data) {
 
-      try {
+      document.getElementById("updated").innerText =
+        "Last updated: " +
+        new Date().toLocaleTimeString();
 
-        document
-          .getElementById("updated")
-          .innerText =
-            "Last updated: " +
-            new Date()
-              .toLocaleTimeString();
+      showStandings(data);
 
-        showStandings(data);
-
-      } finally {
-
-        delete window[
-          callbackName
-        ];
-
-        const script =
-          document.getElementById(
-            "perryDataScript"
-          );
-
-        if (script) {
-          script.remove();
-        }
-
-      }
-
+      delete window[callbackName];
     };
 
 
   const script =
-    document.createElement(
-      "script"
-    );
-
-
-  script.id =
-    "perryDataScript";
-
+    document.createElement("script");
 
   script.src =
     API_URL +
     "?api=overallBiggestFish" +
     "&division=" +
-    encodeURIComponent(
-      selectedDivision
-    ) +
+    encodeURIComponent(selectedDivision) +
     "&callback=" +
-    encodeURIComponent(
-      callbackName
-    );
+    callbackName +
+    "&t=" +
+    Date.now();
 
 
   script.onerror =
     function() {
 
-      document
-        .getElementById("standings")
-        .innerHTML =
-          '<div class="error">' +
-          'Unable to load leaderboard.' +
-          '</div>';
+      document.getElementById("standings").innerHTML =
+        '<div class="error">' +
+        'Unable to load leaderboard.' +
+        '</div>';
 
-      delete window[
-        callbackName
-      ];
-
+      delete window[callbackName];
     };
 
 
-  document.body.appendChild(
-    script
-  );
+  document.body.appendChild(script);
 
 }
 function showStandings(data) {
