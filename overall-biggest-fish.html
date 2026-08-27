@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
   <meta charset="UTF-8">
@@ -10,26 +9,186 @@
     content="width=device-width, initial-scale=1"
   >
 
-  <title>
-    JYSA Fishing - Season Biggest Fish
-  </title>
+  <title>JYSA Fishing - Overall Biggest Fish</title>
 
   <style>
 
-    html,
     body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #f4f6f8;
+      font-family: Arial, sans-serif;
+      background: #f3f6f9;
+      color: #071b33;
     }
 
-    iframe {
-      display: block;
-      width: 100%;
-      height: 100vh;
-      border: 0;
+    .header {
+      background: linear-gradient(
+        135deg,
+        #071b33 0%,
+        #0b355c 55%,
+        #0867c8 100%
+      );
+      color: white;
+      text-align: center;
+      padding: 22px 15px;
+      border-bottom: 4px solid #b9c1c9;
+    }
+
+    .brand {
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .header h1 {
+      margin: 5px 0;
+      font-size: 28px;
+    }
+
+    .header p {
+      margin: 0;
+      color: #dce8f4;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px 12px;
+    }
+
+    .division-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 15px;
+    }
+
+    .division-button {
+      flex: 1;
+      border: 1px solid #b9c1c9;
+      padding: 10px 5px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #dfe5eb;
+      color: #071b33;
+    }
+
+    .division-button.active {
+      background: #0867c8;
+      color: white;
+      border-color: #0867c8;
+    }
+
+    .updated {
+      text-align: center;
+      color: #657586;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .fish-card {
+      display: grid;
+      grid-template-columns: 60px 1fr 80px 60px;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      border: 1px solid #dce3e9;
+    }
+
+    .place {
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .angler {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .details {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .weight {
+      text-align: right;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .photo-button {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      background: #0867c8;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 26px;
+    }
+
+    .first {
+      background: #fff4c2;
+    }
+
+    .second {
+      background: #eeeeee;
+    }
+
+    .third {
+      background: #f4dfcf;
+    }
+
+    .loading,
+    .error {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .error {
+      color: #a40000;
+    }
+
+    @media (max-width: 500px) {
+
+      .division-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .fish-card {
+        grid-template-columns:
+          45px 1fr 65px 50px;
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .angler {
+        font-size: 15px;
+      }
+
+      .details {
+        font-size: 11px;
+      }
+
+      .weight {
+        font-size: 15px;
+      }
+
+      .photo-button {
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+      }
+
     }
 
   </style>
@@ -38,11 +197,279 @@
 
 <body>
 
-  <iframe
-  src="https://script.google.com/macros/s/AKfycbxxdiXA38ymyv4tCfVQ5Em0CaIZp9zheAWaQAdwu6R8wauc-KXEmh_cN9ILvOvfEsVr/exec?view=overallBiggestFish"
-  title="JYSA Fishing Season Biggest Fish">
-</iframe>
+  <div class="header">
+    <div class="brand">
+      JYSA FISHING
+    </div>
+
+    <h1>
+      Overall Biggest Fish
+    </h1>
+
+    <p>
+      Season Leaderboard
+    </p>
+  </div>
+
+
+  <div class="container">
+
+    <div class="division-tabs">
+
+      <button
+        class="division-button active"
+        onclick="changeDivision('1st-2nd Grade', this)">
+        1st-2nd
+      </button>
+
+      <button
+        class="division-button"
+        onclick="changeDivision('3rd-4th Grade', this)">
+        3rd-4th
+      </button>
+
+      <button
+        class="division-button"
+        onclick="changeDivision('5th-6th Grade', this)">
+        5th-6th
+      </button>
+
+      <button
+        class="division-button"
+        onclick="changeDivision('7th-8th Grade', this)">
+        7th-8th
+      </button>
+
+    </div>
+
+    <div
+      id="updated"
+      class="updated">
+      Loading leaderboard...
+    </div>
+
+    <div id="standings">
+      <div class="loading">
+        Loading...
+      </div>
+    </div>
+
+  </div>
+
+
+<script>
+
+const API_URL =
+  "PASTE_YOUR_EXEC_URL_HERE";
+
+let selectedDivision =
+  "1st-2nd Grade";
+
+
+function changeDivision(
+  division,
+  button
+) {
+
+  selectedDivision = division;
+
+  document
+    .querySelectorAll(".division-button")
+    .forEach(function(btn) {
+      btn.classList.remove("active");
+    });
+
+  button.classList.add("active");
+
+  loadStandings();
+
+}
+
+
+async function loadStandings() {
+
+  try {
+
+    const url =
+      API_URL +
+      "?api=overallBiggestFish" +
+      "&division=" +
+      encodeURIComponent(
+        selectedDivision
+      );
+
+    const response =
+      await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(
+        "Unable to load leaderboard."
+      );
+    }
+
+    const data =
+      await response.json();
+
+    document
+      .getElementById("updated")
+      .innerText =
+        "Last updated: " +
+        new Date()
+          .toLocaleTimeString();
+
+    showStandings(data);
+
+  } catch (error) {
+
+    document
+      .getElementById("standings")
+      .innerHTML =
+        '<div class="error">' +
+        escapeHtml(error.message) +
+        '</div>';
+
+  }
+
+}
+
+
+function showStandings(data) {
+
+  const standings =
+    data.standings || [];
+
+  if (standings.length === 0) {
+
+    document
+      .getElementById("standings")
+      .innerHTML =
+        '<div class="loading">' +
+        'No fish submitted yet.' +
+        '</div>';
+
+    return;
+
+  }
+
+  let html = "";
+
+  standings.forEach(
+    function(row) {
+
+      let placeClass = "";
+
+      if (row.place === 1) {
+        placeClass = "first";
+      }
+
+      if (row.place === 2) {
+        placeClass = "second";
+      }
+
+      if (row.place === 3) {
+        placeClass = "third";
+      }
+
+      let medal = row.place;
+
+      if (row.place === 1) {
+        medal = "🥇";
+      }
+
+      if (row.place === 2) {
+        medal = "🥈";
+      }
+
+      if (row.place === 3) {
+        medal = "🥉";
+      }
+
+      let photoHtml = "";
+
+      if (row.photo) {
+
+        photoHtml =
+          '<a class="photo-button" ' +
+          'href="' +
+          escapeHtml(row.photo) +
+          '" target="_blank" ' +
+          'rel="noopener noreferrer">' +
+          '📷' +
+          '</a>';
+
+      }
+
+      html +=
+        '<div class="fish-card ' +
+        placeClass +
+        '">' +
+
+          '<div class="place">' +
+          medal +
+          '</div>' +
+
+          '<div>' +
+
+            '<div class="angler">' +
+            escapeHtml(
+              row.angler || "Angler"
+            ) +
+            '</div>' +
+
+            '<div class="details">' +
+            escapeHtml(row.team) +
+            ' • ' +
+            escapeHtml(row.tournament) +
+            '</div>' +
+
+          '</div>' +
+
+          '<div class="weight">' +
+          Number(row.weight)
+            .toFixed(2) +
+          ' lbs' +
+          '</div>' +
+
+          '<div>' +
+          photoHtml +
+          '</div>' +
+
+        '</div>';
+
+    }
+  );
+
+  document
+    .getElementById("standings")
+    .innerHTML = html;
+
+}
+
+
+function escapeHtml(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    text === undefined ||
+    text === null
+      ? ""
+      : String(text);
+
+  return div.innerHTML;
+
+}
+
+
+loadStandings();
+
+setInterval(
+  loadStandings,
+  30000
+);
+
+</script>
 
 </body>
-
 </html>
